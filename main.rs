@@ -1,8 +1,9 @@
-#[macro_use] extern crate rocket;
+#[macro_use]
+extern crate rocket;
 
-use rocket::serde::{Serialize, Deserialize, json::Json};
-use std::sync::Mutex;
+use rocket::serde::{json::Json, Deserialize, Serialize};
 use rocket::State;
+use std::sync::Mutex;
 
 #[derive(Serialize, Deserialize, Clone)]
 struct Task {
@@ -42,5 +43,7 @@ fn delete_task(task_list: &State<TaskList>, id: usize) -> Option<Json<Vec<Task>>
 fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![create_task, get_tasks, delete_task])
-        .manage(TaskList { tasks: Mutex::new(vec![]) })
+        .manage(TaskList {
+            tasks: Mutex::new(vec![]),
+        })
 }
