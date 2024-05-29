@@ -16,6 +16,13 @@ const TaskManager: React.FC = () => {
     setTasks([...tasks, task]);
   };
 
+  const editTask = (taskId: string, title: string, description: string) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, title, description } : task
+    );
+    setTasks(updatedTasks);
+  };
+
   const toggleTaskCompletion = (taskId: string) => {
     const updatedTasks = tasks.map(task => 
       task.id === taskId ? { ...task, completed: !task.completed } : task
@@ -39,6 +46,7 @@ const TaskManager: React.FC = () => {
         tasks={tasks}
         toggleTaskCompletion={toggleTaskCompletion}
         deleteTask={deleteTask}
+        editTask={editTask}
       />
     </div>
   );
