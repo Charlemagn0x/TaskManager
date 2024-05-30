@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 
@@ -10,43 +10,40 @@ interface Task {
 }
 
 const TaskManager: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskList, setTaskList] = useState<Task[]>([]);
 
-  const addTask = (task: Task) => {
-    setTasks([...tasks, task]);
+  const handleAddTask = (newTask: Task) => {
+    setTaskList([...taskList, newTask]);
   };
 
-  const editTask = (taskId: string, title: string, description: string) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, title, description } : task
+  const handleEditTask = (taskId: string, updatedTitle: string, updatedDescription: string) => {
+    const updatedTaskList = taskList.map(task => 
+      task.id === taskId ? { ...task, title: updatedTitle, description: updatedDescription } : task
     );
-    setTasks(updatedTasks);
+    setTaskList(updatedTaskList);
   };
 
-  const toggleTaskCompletion = (taskId: string) => {
-    const updatedTasks = tasks.map(task => 
+  const handleToggleTaskCompletion = (taskId: string) => {
+    const updatedTaskList = taskList.map(task => 
       task.id === taskId ? { ...task, completed: !task.completed } : task
     );
-    setTasks(updatedTasks);
+    setTaskList(updatedTaskList);
   };
 
-  const deleteTask = (taskId: string) => {
-    const updatedTasks = tasks.filter(task => task.id !== taskId);
-    setTasks(updatedTasks);
+  const handleDeleteTask = (taskId: string) => {
+    const remainingTasks = taskList.filter(task => task.id !== taskId);
+    setTaskList(remainingTasks);
   };
-
-  useEffect(() => {
-  }, []);
 
   return (
     <div>
       <h1>Task Manager</h1>
-      <TaskForm addTask={addTask} />
+      <TaskForm addTask={handleAddTask} />
       <TaskList
-        tasks={tasks}
-        toggleTaskCompletion={toggleTaskCompletion}
-        deleteTask={deleteTask}
-        editTask={editTask}
+        tasks={taskList}
+        toggleTaskCompletion={handleToggleTaskCompletion}
+        deleteTask={handleDeleteTask}
+        editTask={handleEditTask}
       />
     </div>
   );
