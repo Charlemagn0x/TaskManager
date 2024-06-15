@@ -20,8 +20,15 @@ const TasksListComponent: React.FC = () => {
   }, []);
 
   const deleteTask = async (id: string) => {
-    await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/tasks/${id}`);
-    setTasks(tasks.filter(task => task.id !== id));
+    const updatedTasks = tasks.filter(task => task.id !== id);
+    setTasks(updatedTasks);
+
+    try {
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/tasks/${id}`);
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      setTasks(tasks);
+    }
   };
 
   const addTask = async () => {
