@@ -1,65 +1,65 @@
 import { useState, useEffect } from 'react';
 
-// Custom hook for using local storage
-function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(() => {
+function useLocalStorage<T>(storageKey: string, defaultValue: T) {
+  const [value, setValue] = useState<T>(() => {
     try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      const item = window.localStorage.getItem(storageKey);
+      return item ? JSON.parse(item) : defaultValue;
     } catch (error) {
-      console.log(error);
-      return initialValue;
+      console.log('Loading local storage failed:', error);
+      return defaultValue;
     }
   });
 
-  const setValue = (value: T | ((val: T) => T)) => {
+  const updateValue = (newValue: T | ((currentValue: T) => T)) => {
     try {
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      const valueToBeStored =
+        newValue instanceof Function ? newValue(value) : newValue;
+      setValue(valueToBeStored);
+      window.localStorage.setItem(storageKey, JSON.stringify(valueToBeStored));
     } catch (error) {
-      console.log(error);
+      console.log('Saving to local storage failed:', error);
     }
   };
 
-  return [storedValue, setValue] as const;
+  return [value, updateValue] as const;
 }
 
 export default useLocalStorage;
 ```
+
 ```typescript
 import React from 'react';
 import useLocalStorage from './useLocalStorage';
 
-function App() {
-  const [task, setTask] = useLocalStorage('task', '');
+function TaskApp() {
+  const [taskText, setTaskText] = useLocalStorage('task', '');
 
   return (
     <div>
       <input
         type="text"
-        value={task}
-        onChange={(e) => setTask(e.target.value)}
+        value={taskText}
+        onChange={(e) => setTaskText(e.target.value)}
       />
-      <p>{`Task: ${task}`}</p>
+      <p>{`Task: ${taskText}`}</p>
     </div>
   )
 }
 
-export default App;
+export default TaskApp;
 ```
+
 ```typescript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Fragment } from 'react'; // Ensure Fragment is imported
-import App from './App';
+import TaskApp from './TaskApp';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Fragment>
-    <App />
-    </Fragment>
+    <React.Fragment>
+      <TaskApp />
+    </React.Fragment>
   </React.StrictMode>,
   document.getElementById('root')
 );
