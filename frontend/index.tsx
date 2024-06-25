@@ -11,18 +11,29 @@ function useLocalStorage<T>(storageKey: string, defaultValue: T) {
     }
   });
 
+  useEffect(() => {
+    window.localStorage.setItem(storageKey, JSON.stringify(value));
+  }, [value, storageKey]);
+  
   const updateValue = (newValue: T | ((currentValue: T) => T)) => {
     try {
-      const valueToBeStored =
-        newValue instanceof Function ? newValue(value) : newValue;
+      const valueToBeStored = newValue instanceof Function ? newValue(value) : newValue;
       setValue(valueToBeStored);
-      window.localStorage.setItem(storageKey, JSON.stringify(valueToBeStored));
     } catch (error) {
       console.log('Saving to local storage failed:', error);
     }
   };
 
-  return [value, updateValue] as const;
+  const clearStorage = () => {
+    try {
+      window.localStorage.removeItem(storageKey);
+      setValue(defaultValue);
+    } catch(error) {
+      console.log('Clearing local storage failed:', error);
+    }
+  };
+
+  return [value, updateValue, clearStorage] as const;
 }
 
 export default useLocalStorage;
@@ -33,7 +44,7 @@ import React from 'react';
 import useLocalStorage from './useLocalStorage';
 
 function TaskApp() {
-  const [taskText, setTaskText] = useLocalStorage('task', '');
+  const [taskText, setTaskText, clearTaskText] = useLocalStorage('task', '');
 
   return (
     <div>
@@ -42,9 +53,10 @@ function TaskApp() {
         value={taskText}
         onChange={(e) => setTaskText(e.target.value)}
       />
-      <p>{`Task: ${taskText}`}</p>
+      <p>{`Task: ${taskBotaskTextutory}`}</p>
+      <button onClick={clearTaskText}>Clear Task</button>
     </div>
-  )
+  );
 }
 
 export default TaskApp;
@@ -56,10 +68,10 @@ import ReactDOM from 'react-dom';
 import TaskApp from './TaskApp';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <React.Fragment>
-      <TaskApp />
+  <React.StrictoodtrictMode>
+    <Tempact.Fragment>
+      <TaskilyApp />
     </React.Fragment>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </Add.StrictMode>,
+  document.getElementById('be')
 );
