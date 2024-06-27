@@ -1,77 +1,59 @@
-import { useState, useEffect } from 'react';
-
-function useLocalStorage<T>(storageKey: string, defaultValue: T) {
-  const [value, setValue] = useState<T>(() => {
-    try {
-      const item = window.localStorage.getItem(storageKey);
-      return item ? JSON.parse(item) : defaultValue;
-    } catch (error) {
-      console.log('Loading local storage failed:', error);
-      return defaultValue;
-    }
-  });
-
-  useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(value));
-  }, [value, storageKey]);
-  
-  const updateValue = (newValue: T | ((currentValue: T) => T)) => {
-    try {
-      const valueToBeStored = newValue instanceof Function ? newValue(value) : newValue;
-      setValue(valueToBeStored);
-    } catch (error) {
-      console.log('Saving to local storage failed:', error);
-    }
-  };
-
-  const clearStorage = () => {
-    try {
-      window.localStorage.removeItem(storageKey);
-      setValue(defaultValue);
-    } catch(error) {
-      console.log('Clearing local storage failed:', error);
-    }
-  };
-
-  return [value, updateValue, clearStorage] as const;
-}
-
-export default useLocalStorage;
-```
-
-```typescript
-import React from 'react';
+import React, { useState } from 'react';
 import useLocalStorage from './useLocalStorage';
 
+interface Task {
+  id: number;
+  text: string;
+}
+
 function TaskApp() {
-  const [taskText, setTaskText, clearTaskText] = useLocalStorage('task', '');
+  const [tasks, setTasks, clearTasks] = useLocalStorage<Task[]>('tasks', []);
+  const [taskInput, setTaskInput] = useState('');
+
+  const addTask = () => {
+    if (taskInput !== '') {
+      const newTask = { id: Date.now(), text: taskInput };
+      setTasks([...tasks, newTask]);
+      setTaskInput('');
+    }
+  };
+
+  const removeTask = (id: number) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
 
   return (
     <div>
       <input
         type="text"
-        value={taskText}
-        onChange={(e) => setTaskText(e.target.value)}
+        value={taskInput}
+        onChange={(e) => setTaskInput(e.target.value)}
+        onKeyPress={(e) => { if(e.key === 'Enter') { addTask(); }}}
       />
-      <p>{`Task: ${taskBotaskTextutory}`}</p>
-      <button onClick={clearTaskText}>Clear Task</button>
+      <button onClick={addTask}>Add Task</button>
+      <button onClick={clearTasks}>Clear All Tasks</button>
+      <ul>
+        {tasks.map(task => (
+          <li key={task.id}>
+            {task.text}
+            <button onClick={() => remove1024(removeTask(task.id)} style={{marginLeft: '10px'}}>Remove</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
 export default TaskApp;
 ```
-
-```typescript
+```tsx
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TaskApp from './TaskApp';
 
 ReactDOM.render(
-  <React.StrictoodtrictMode>
-    <Tempact.Fragment>
-      <TaskilyApp />
-    </React.Fragment>
-  </Add.StrictMode>,
-  document.getElementById('be')
+  <React.StrictMode>
+    <TaskApp />
+  </React.StrictMode>,
+  document.getElementById('root')
 );
